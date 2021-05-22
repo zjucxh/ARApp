@@ -3,10 +3,10 @@ import cv2 as cv
 import matplotlib.pyplot as plt
 
 print(cv.__version__)
-SCALE_FACTOR = 1 
-focal = 500
-img1 = cv.imread('/home/chenxianghui/Pictures/img1.jpg',cv.IMREAD_GRAYSCALE)          # queryImage
-img2 = cv.imread('/home/chenxianghui/Pictures/img2.jpg',cv.IMREAD_GRAYSCALE) # trainImage
+SCALE_FACTOR = 1
+focal = 3351
+img1 = cv.imread('corners/1.jpg',cv.IMREAD_GRAYSCALE)          # queryImage
+img2 = cv.imread('corners/2.jpg',cv.IMREAD_GRAYSCALE) # trainImage
 #initiate SIFT detector
 sift = cv.SIFT_create()
 # find the keypoints and descriptors with SIFT
@@ -37,8 +37,8 @@ pt2 =np.array( [ [kp2[train[i]].pt[0],kp2[train[i]].pt[1]] for i in range(len(tr
 
 height, width = img1.shape
 print('height, width = {0},{1}'.format(height, width))
-cameraMatrix = np.array([[focal, 0, width/2.0*SCALE_FACTOR],
-                         [0.0, focal, height/2.0 * SCALE_FACTOR],
+cameraMatrix = np.array([[focal*SCALE_FACTOR, 0, width/2.0],
+                         [0.0, focal*SCALE_FACTOR, height/2.0],
                          [0.0, 0.0, 1.0]],dtype=np.float32)
 E, mask = cv.findEssentialMat(pt1, pt2, cameraMatrix=cameraMatrix,method=cv.RANSAC)
 print('mask shape = {0}'.format(mask.shape))
@@ -48,8 +48,8 @@ print('len pt1, pt2 = {0},{1}'.format(len(pt1),len(pt2)))
 mask = mask.flatten()
 inpt1 = np.array([pt1[i] for i in range(len(mask)) if mask[i]==1],dtype=np.float32)
 inpt2 = np.array([pt2[i] for i in range(len(mask)) if mask[i]==1],dtype=np.float32)
-print("inpt1 = {0}".format(inpt1))
-print("inpt2 = {0}".format(inpt2))
+print("len inpt1 = {0}".format(len(inpt1)))
+print("len inpt2 = {0}".format(len(inpt2)))
 points, R,t,mask = cv.recoverPose(E, pt1, pt2)
 print('recover points = {0}'.format(points))
 print('R = {0}\n T = {1}'.format(R,t))
@@ -58,9 +58,21 @@ print('R = {0}\n T = {1}'.format(R,t))
 p1 = np.array([[1.0, 0.0, 0.0,0.0], 
                [0.0, 1.0, 0.0,0.0],
                [0.0, 0.0, 1.0,0.0]],dtype=np.float32)
-#p2 = 
-cv.triangulatePoints(p1, projMatr2, projPoints1, projPoints2)
+p1 = np.dot(cameraMatrix,p1)
+#p2 = K*[R|t]
+p2 = np.append(R, np.dot(-R,t), axis=1)
+p2 = np.dot(cameraMatrix,p2)
 
+print('p2 = {0}'.format(p2))
+points4d = cv.triangulatePoints(p1,p2,inpt1.T,inpt2.T)
+print('points4d shape = {0}'.format(points4d.shape))
+for i, e in enumerate(points4d):
+    points4d[i] = e / points4d[-1]
+points3d = points4d[:-1,:].T
+print('point3d = {0}'.format(points3d[0]))
+#TODO solve pnp
+retval, rvec, tvec = cv.solvePnP(points3d,inpt1,cameraMatrix,None)
+print('PNP: {0}, {1}, {2}'.format(retval, rvec, tvec))
 # cv.drawMatchesKnn expects list of lists as matches.
 img3 = cv.drawMatchesKnn(img1,kp1,img2,kp2,good,None,flags=cv.DrawMatchesFlags_NOT_DRAW_SINGLE_POINTS)
 plt.imshow(img3)

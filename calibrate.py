@@ -39,6 +39,7 @@ cv.destroyAllWindows()
 ret, mtx, dist, rvecs, tvecs = cv.calibrateCamera(objpoints, imgpoints, gray.shape[::-1], None, None)
 #rotm1, _ = cv.Rodrigues(rvecs[0])
 #rotm2, _ = cv.Rodrigues(rvecs[1])
+print('mtx = {0}'.format(mtx))
 print('rvecs={0}'.format(rvecs))
 print('tvecs = {0}'.format(tvecs))
 

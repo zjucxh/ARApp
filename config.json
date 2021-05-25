@@ -1,0 +1,11 @@
+{
+"image":{
+"image_left":"/home/chenxianghui/Pictures/board1.jpg",
+"image_right":"/home/chenxianghui/Pictures/board2.jpg"
+},
+"CameraIntrinsic":{
+"focal":3351,
+"u0":2019.4073,
+"v0":1547.5577
+}
+}

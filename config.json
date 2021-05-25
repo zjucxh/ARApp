@@ -1,7 +1,7 @@
 {
 "image":{
-"image_left":"/home/chenxianghui/Pictures/board1.jpg",
-"image_right":"/home/chenxianghui/Pictures/board2.jpg"
+"image_left":"/home/chenxianghui/Pictures/img1.jpg",
+"image_right":"/home/chenxianghui/Pictures/img2.jpg"
 },
 "CameraIntrinsic":{
 "focal":3351,

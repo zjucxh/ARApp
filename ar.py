@@ -81,7 +81,7 @@ class AR():
         P1 = np.append(self.camera_left.rtom,t, axis=1)
         P1 = np.dot(self.camera_left.intrinsic, P1)
         t = np.reshape(self.camera_right.tvec, (3,1))
-        t = np.dot(-self.camera_right.rtom, t)
+        #t = np.dot(-self.camera_right.rtom, t)
         P2 = np.append(self.camera_right.rtom,t, axis=1)
         P2 = np.dot(self.camera_right.intrinsic, P2)
         print("projection = {0}, {1}".format(P1,P2))
@@ -104,7 +104,12 @@ if __name__ == '__main__':
     #ar.draw_good_matches()
     ar.recover_pose()
     ar.triangulate()
+    #draw left image projection
     pt2d = reproject(ar.camera_left, ar.depth_point)
     image = ar.image_left
-    utils.draw_point2d(image, pt2d)
+    utils.draw_point2d(image, pt2d, 1)
+    #Draw right image projection 
+    pt2d = reproject(ar.camera_right, ar.depth_point)
+    image = ar.image_right
+    utils.draw_point2d(image, pt2d, 2)
 
